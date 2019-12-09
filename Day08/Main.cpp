@@ -16,15 +16,19 @@ ifstream in("input.txt");
 
 vector<string> layers;
 string strr;
-char pixel(int x, int y)
+
+char pixel(ll x, ll y)
 {
-	int layer = 0;
-	int pix;
+	ll layer = 0;
+	char pixel;
+
 	while (1)
 	{
-		pix = strr[(25 * 6 * layer) + (y * 25) + x];
-		if (pix != '2')
-			return pix;
+		pixel = layers[layer][25 * y + x];
+
+		if (pixel != '2')
+			return pixel;
+
 		layer++;
 	}
 }
@@ -44,27 +48,32 @@ int main()
 		layers.push_back(y.substr(0, 25 * 6));
 		y.erase(0, 25 * 6);
 	}
-	int c0, minc0 = 99999, minV = 0;
+
+	ll min_0 = LONG_MAX, min_12;
 
 	for (auto it : layers)
 	{
-		c0 = count(it.begin(), it.end(), '0');
-		if (c0 < minc0)
+		ll c0 = count(it.begin(), it.end(), '0');
+		ll c1 = count(it.begin(), it.end(), '1');
+		ll c2 = count(it.begin(), it.end(), '2');
+	
+		if (c0 < min_0)
 		{
-			minc0 = c0;
-			minV = count(it.begin(), it.end(), '1') * count(it.begin(), it.end(), '2');
+			min_0 = c0;
+			min_12 = c1 * c2;
 		}
 	}
 
-	cout << minV << endl;
+	cout << "Part1 : " <<  min_12 << endl;
+	cout << "Part2 : " << endl;
 
-	for(int y = 0; y < 6; ++y)
+	for(ll y = 0; y < 6; ++y)
 	{ 
-		for (int x = 0; x < 25; ++x)
+		for (ll x = 0; x < 25; ++x)
 		{
 			char pixx = pixel(x, y);
 			if ( pixx == '0') cout << ' ';
-			if ( pixx == '1') cout << '#';
+			if ( pixx == '1') cout << '$';
 			
 		}
 		cout << endl;
