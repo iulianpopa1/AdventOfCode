@@ -16,115 +16,134 @@ ifstream in("P_input.txt");
 
 ll relativeBase;
 
+void split_instructions(vector<ll> vec, ll index, ll& opcode, ll& C, ll& B, ll& A)
+{
+	ll coded = vec[index];
 
-bool do_instructions(vector<ll>&vec, queue<ll>& inp, queue<ll>& out)
+	// mode
+	// A B C OP
+	// - - - --
+	opcode = coded % 100;
+	coded /= 100;
+	C = coded % 10;
+	coded /= 10;
+	B = coded % 10;
+	coded /= 10;
+	A = coded % 10;
+	coded /= 10;
+}
+
+void decode_instructions(vector<ll> vec, ll index, ll& C, ll& B, ll& A)
+{
+	switch (C)
+	{
+	case 0:
+		C = vec[index + 1];
+		break;
+	case 1:
+		C = index + 1;
+		break;
+	case 2:
+		C = vec[index + 1] + relativeBase;
+		break;
+	}
+
+	switch (B)
+	{
+	case 0:
+		B = vec[index + 2];
+		break;
+	case 1:
+		B = index + 2;
+		break;
+	case 2:
+		B = vec[index + 2] + relativeBase;
+		break;
+	}
+
+	switch (A)
+	{
+	case 0:
+		A = vec[index + 3];
+		break;
+	case 1:
+		A = index + 3;
+		break;
+	case 2:
+		A = vec[index + 3] + relativeBase;
+		break;
+	}
+}
+
+bool do_instructions(vector<ll>&vec, queue<ll>& inputQ, queue<ll>& outputQ)
 {
 	ll index = 0;
 	relativeBase = 0;
 
 	while (1)
-	{
-		ll val = vec[index];
+	{ 
+		ll opcode, C, B, A;
 
-		ll opcode = val % 100;
-		val /= 100;
-		ll modeC = val % 10;
-		val /= 10;
-		ll modeB = val % 10;
-		val /= 10;
-		ll modeA = val % 10;
-		val /= 10;
-
+		split_instructions(vec, index, opcode, C, B, A);
+		
 		if (opcode == 99)
 		{
 			return true;
 		}
 
-		ll opA, opB, opC;
+		decode_instructions(vec, index, C, B, A);
 
-		if (modeC == 0)
-			opC = vec[index + 1];
-		else if (modeC == 1)
-			opC = index + 1;
-		else
-			opC = vec[index + 1] + relativeBase;
-
-		if (modeB == 0)
-			opB = vec[index + 2];
-		else if (modeB == 1)
-			opB = index + 2;
-		else
-			opB = vec[index + 2] + relativeBase;
-
-		if (modeA == 0)
-			opA = vec[index + 3];
-		else if (modeA == 1)
-			opA = index + 3;
-		else
-			opA = vec[index + 3] + relativeBase;
-		if (opcode == 1)//sum A = B + C
+		switch (opcode)
 		{
-			vec[opA] = vec[opC] + vec[opB];
+		case 1: // A = B + C
+			vec[A] = vec[B] + vec[C];
 			index += 4;
-		}
-		else if (opcode == 2) //multiply A = B * C
-		{
-			vec[opA] = vec[opC] * vec[opB];
-
+			break;
+		case 2: // A = B * C
+			vec[A] = vec[B] * vec[C];
 			index += 4;
-		}
-		else if (opcode == 3) //input
-		{
-			if (inp.empty())
+			break;
+		case 3: // C = INPUT
+			if (inputQ.empty())
 				return false;
-
-			vec[opC] = inp.front();
-			inp.pop();
-
+			vec[C] = inputQ.front();
+			inputQ.pop();
 			index += 2;
-		}
-		else if (opcode == 4) //output
-		{
-			out.push(vec[opC]);
+			break;
+		case 4: // OUTPUT
+			outputQ.push(vec[C]);
 			index += 2;
-		}
-		else if (opcode == 5) // jump-if-true
-		{
-			if (vec[opC] != 0)
-				index = vec[opB];
+			break;
+		case 5: // jump-if-true
+			if (vec[C] != 0)
+				index = vec[B];
 			else
 				index += 3;
-		}
-		else if (opcode == 6) // jump-if-false
-		{
-			if (vec[opC] == 0)
-				index = vec[opB];
+			break;
+		case 6: // jump-if-false
+			if (vec[C] == 0)
+				index = vec[B];
 			else
 				index += 3;
-		}
-		else if (opcode == 7)
-		{
-			if (vec[opC] < vec[opB])
-				vec[opA] = 1;
+			break;
+		case 7: // A = (C < B)
+			if (vec[C] < vec[B])
+				vec[A] = 1;
 			else
-				vec[opA] = 0;
-
+				vec[A] = 0;
 			index += 4;
-		}
-		else if (opcode == 8)
-		{
-			if (vec[opC] == vec[opB])
-				vec[opA] = 1;
+			break;
+		case 8: // A = (C == B)
+			if (vec[C] == vec[B])
+				vec[A] = 1;
 			else
-				vec[opA] = 0;
-
+				vec[A] = 0;
 			index += 4;
-		}
-		else if (opcode == 9)
-		{
-			relativeBase += vec[opC];
-
+			break;
+		case 9: // relative base += C
+			relativeBase += vec[C];
 			index += 2;
+			break;
 		}
 	}
 }
@@ -141,17 +160,18 @@ int main()
 		in >> x;
 		vec.push_back(x);
 	}
+	for (int k = 0; k < 10000; k++)
+		vec.push_back(0);
+
 	ll index = 0;
 	queue<ll> inp, out;
 
 	inp.push(1); // 1 for part1, 2 for part2
+	// Part 2 takes a little more time (at least for my input)
 
 	do_instructions(vec, inp, out);
 
-	while (!out.empty())
-	{
-		cout << out.front() << endl;
-		out.pop();
-	}
+	cout << out.front() << endl;
+	out.pop();
 
 }
