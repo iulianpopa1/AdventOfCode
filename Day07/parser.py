@@ -1,8 +1,16 @@
-#fin = open("input.txt", "r")
+fin = open("input.txt", "r")
 fout = open("P_input.txt", 'w')
-with open("input.txt", "r") as fin:
-    line = fin.readline()
+
+splitted_lines = []
+lines = fin.readlines()
+for line in lines:
     splitted = line.split(sep=',')
     print(splitted)
+
     for elem in splitted:
-        fout.write(elem + '\n')
+        splitted_lines.append(elem) #extend(elem)
+
+print(splitted_lines)
+
+for elem in splitted_lines:
+    fout.write(elem + '\n')

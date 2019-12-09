@@ -15,175 +15,144 @@ using ll = long long;
 
 ifstream in("P_input.txt");
 
+void split_instructions(vector<ll> vec, ll index, ll& opcode, ll& C, ll& B, ll& A)
+{
+	ll coded = vec[index];
 
-bool do_instructions(vector<ll> &vec , ll &index, queue<ll> &inp, queue<ll> &out)
+	// mode
+	// A B C OP
+	// - - - --
+	opcode = coded % 100;
+	coded /= 100;
+	C = coded % 10;
+	coded /= 10;
+	B = coded % 10;
+	coded /= 10;
+	A = coded % 10;
+	coded /= 10;
+}
+
+void decode_instructions(vector<ll> vec, ll index, ll& C, ll& B, ll& A)
+{
+	switch (C)
+	{
+	case 0:
+		C = vec[index + 1];
+		break;
+	case 1:
+		C = index + 1;
+		break;
+	}
+
+	switch (B)
+	{
+	case 0:
+		B = vec[index + 2];
+		break;
+	case 1:
+		B = index + 2;
+		break;
+	}
+
+	switch (A)
+	{
+	case 0:
+		A = vec[index + 3];
+		break;
+	case 1:
+		A = index + 3;
+		break;
+	}
+}
+
+bool do_instructions(vector<ll> &vec , ll &index, queue<ll> &inputQ, queue<ll> &outputQ)
 {
 	while (1)
 	{
-		ll val = vec[index];
+		ll opcode, C, B, A;
 
-		ll opcode = val % 100;
-		val /= 100;
-		ll modeC = val % 10;
-		val /= 10;
-		ll modeB = val % 10;
-		val /= 10;
-		ll modeA = val % 10;
-		val /= 10;
+		split_instructions(vec, index, opcode, C, B, A);
 
-		ll opB = -1, opC = -1;
-
-		if (opcode == 1)//sum
-		{
-			if (modeB == 0)
-				opB = vec[vec[index + 2]];
-			else
-				opB = vec[index + 2];
-
-			if (modeC == 0)
-				opC = vec[vec[index + 1]];
-			else
-				opC = vec[index + 1];
-
-			vec[vec[index + 3]] = opB + opC;
-			index += 4;
-		}
-		else if (opcode == 2) //multiply
-		{
-			if (modeB == 0)
-				opB = vec[vec[index + 2]];
-			else
-				opB = vec[index + 2];
-
-			if (modeC == 0) opC = vec[vec[index + 1]];
-			else			opC = vec[index + 1];
-
-			if (modeC == 0)
-				opC = vec[vec[index + 1]];
-			else
-				opC = vec[index + 1];
-			vec[vec[index + 3]] = opB * opC;
-
-			index += 4;
-		}
-		else if (opcode == 3) //input
-		{
-			if (inp.empty())
-				return false;
-
-			vec[vec[index + 1]] = inp.front();
-			inp.pop();
-
-			index += 2;
-		}
-		else if (opcode == 4) //output
-		{
-			out.push(vec[vec[index + 1]]);
-
-			index += 2;
-		}
-		else if (opcode == 5) // jump-if-true
-		{
-			if (modeB == 0)
-				opB = vec[vec[index + 2]];
-			else
-				opB = vec[index + 2];
-			if (modeC == 0)
-				opC = vec[vec[index + 1]];
-			else
-				opC = vec[index + 1];
-
-			if (opC != 0)
-				index = opB;
-			else
-				index += 3;
-		}
-		else if (opcode == 6) // jump-if-false
-		{
-			if (modeB == 0)
-				opB = vec[vec[index + 2]];
-			else
-				opB = vec[index + 2];
-			if (modeC == 0)
-				opC = vec[vec[index + 1]];
-			else
-				opC = vec[index + 1];
-
-			if (opC == 0)
-				index = opB;
-			else
-				index += 3;
-		}
-		else if (opcode == 7)
-		{
-			if (modeB == 0)
-				opB = vec[vec[index + 2]];
-			else
-				opB = vec[index + 2];
-			if (modeC == 0)
-				opC = vec[vec[index + 1]];
-			else
-				opC = vec[index + 1];
-
-			if (opC < opB)
-				vec[vec[index + 3]] = 1;
-			else
-				vec[vec[index + 3]] = 0;
-			index += 4;
-		}
-		else if (opcode == 8)
-		{
-			if (modeB == 0)
-				opB = vec[vec[index + 2]];
-			else
-				opB = vec[index + 2];
-			if (modeC == 0)
-				opC = vec[vec[index + 1]];
-			else
-				opC = vec[index + 1];
-
-			if (opC == opB)
-				vec[vec[index + 3]] = 1;
-			else
-				vec[vec[index + 3]] = 0;
-
-			index += 4;
-		}
-		else if (opcode == 99)
+		if (opcode == 99)
 		{
 			return true;
+		}
+
+		decode_instructions(vec, index, C, B, A);
+
+		switch (opcode)
+		{
+		case 1: // A = B + C
+			vec[A] = vec[B] + vec[C];
+			index += 4;
+			break;
+		case 2: // A = B * C
+			vec[A] = vec[B] * vec[C];
+			index += 4;
+			break;
+		case 3: // C = INPUT
+			if (inputQ.empty())
+				return false;
+			vec[C] = inputQ.front();
+			inputQ.pop();
+			index += 2;
+			break;
+		case 4: // OUTPUT
+			outputQ.push(vec[C]);
+			index += 2;
+			break;
+		case 5: // jump-if-true
+			if (vec[C] != 0)
+				index = vec[B];
+			else
+				index += 3;
+			break;
+		case 6: // jump-if-false
+			if (vec[C] == 0)
+				index = vec[B];
+			else
+				index += 3;
+			break;
+		case 7: // A = (C < B)
+			if (vec[C] < vec[B])
+				vec[A] = 1;
+			else
+				vec[A] = 0;
+			index += 4;
+			break;
+		case 8: // A = (C == B)
+			if (vec[C] == vec[B])
+				vec[A] = 1;
+			else
+				vec[A] = 0;
+			index += 4;
 			break;
 		}
 	}
 }
-
 
 int main()
 {
 	ios::sync_with_stdio(false);
 
 	vector <ll> vec;
-	ll x;
 
 	while (!in.eof())
 	{
+		ll x;
 		in >> x;
 		vec.push_back(x);
 	}
 
-	ll phases[] = { 5, 6, 7, 8, 9 };
 	ll MAX_RES = -1;
+	ll phases[] = { 5, 6, 7, 8, 9 };
 
 	while (next_permutation(phases, phases + 5))
-	{	
-		vector<vector<ll>> vects;
+	{
+		vector<vector<ll>> vects(5, vec);
 		vector<queue<ll>> inps(5);
-		vector<ll> pcs;
-
-		vects.clear();
-		vects.push_back(vec); vects.push_back(vec); vects.push_back(vec); vects.push_back(vec); vects.push_back(vec);
-		pcs.push_back(0); pcs.push_back(0); pcs.push_back(0); pcs.push_back(0); pcs.push_back(0);
-		
+		vector<ll> pcs(5, 0);
+	
 		for (int i = 0; i < 5; ++i)
 			inps[i].push(phases[i]);
 
@@ -202,5 +171,4 @@ int main()
 		MAX_RES = max(MAX_RES, inps[0].front());
 	}
 	cout << MAX_RES << endl;
-
 }
