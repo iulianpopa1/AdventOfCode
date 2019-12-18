@@ -19,7 +19,7 @@ ifstream in("input.txt");
 ll dirX[4] = { -1, 0, 1, 0 };
 ll dirY[4] = { 0, -1, 0, 1 };
 
-void find_keys_doors_start(vector<string> v, map<char, pair<ll, ll>>& keys, pair<ll, ll>& start_point)
+void Find_keys_start(vector<string> v, map<char, pair<ll, ll>>& keys, pair<ll, ll>& start_point)
 {
 	for (char c = 'A'; c <= 'Z'; ++c)
 	{
@@ -40,20 +40,14 @@ void find_keys_doors_start(vector<string> v, map<char, pair<ll, ll>>& keys, pair
 	}
 }
 
-ll hsh(ll x, ll y)
+ll BFS(vector<string> v, pair<ll, ll> start, map<char, pair<ll, ll>> keys = map<char, pair<ll, ll>>())
 {
-	//Cantor pairing
-	return ((x + y) * (x + y + 1)) / 2 + y;
-}
-
-ll lee(vector<string> v, pair<ll, ll> start, map<char, pair<ll, ll>> keys = map<char, pair<ll, ll>>())
-{
-	set<pair<ll, ll>> vis;
+	set<tuple<ll, ll, ll>> vis;
 	queue<tuple<ll, ll, ll, ll>> q;
-	
+
 	ll bit_set = 0;
 
-	if(keys.size())
+	if (keys.size())
 		bit_set = pow(2, 26) - 1;
 
 	for (auto it : keys)
@@ -61,13 +55,12 @@ ll lee(vector<string> v, pair<ll, ll> start, map<char, pair<ll, ll>> keys = map<
 		bit_set -= pow(2, (it.first - 'a'));
 	}
 
-	vis.insert({ hsh(start.first, start.second), 0 });
+	vis.insert({ start.first, start.second, 0 });
 	q.push({ start.first, start.second, bit_set , 0 });
 
 
 	while (!q.empty())
 	{
-
 		ll x = get<0>(q.front());
 		ll y = get<1>(q.front());
 		ll bs_ll = get<2>(q.front());
@@ -88,7 +81,7 @@ ll lee(vector<string> v, pair<ll, ll> start, map<char, pair<ll, ll>> keys = map<
 			bitset<26> bs_new = bs;
 
 			if (ch_new == '#') continue;
-			if (vis.find({ hsh(x_new, y_new), bs_ll }) != vis.end()) continue;
+			if (vis.find({ x_new, y_new, bs_ll }) != vis.end()) continue;
 			if (ch_new >= 'A' && ch_new <= 'Z' && !bs[ch_new - 'A']) continue;
 
 			if (ch_new >= 'a' && ch_new <= 'z' && !bs[ch_new - 'a'])
@@ -96,24 +89,24 @@ ll lee(vector<string> v, pair<ll, ll> start, map<char, pair<ll, ll>> keys = map<
 				bs_new[ch_new - 'a'] = 1;
 			}
 
-			vis.insert({ hsh(x_new, y_new), bs_new.to_ulong() });
+			vis.insert({ x_new, y_new, bs_new.to_ulong() });
 			q.push({ x_new, y_new, bs_new.to_ulong(), d + 1 });
 		}
 	}
 }
 
-void split_mat(vector<string> v, vector<string>& v1, vector<string>& v2, vector<string>& v3, vector<string>& v4)
+void Split_map(vector<vector<string>> & v)
 {
-	for (int i = 0; i <= v.size() / 2; ++i)
+	for (int i = 0; i <= v[0].size() / 2; ++i)
 	{
-		v1.push_back(v[i].substr(0, 41));
-		v2.push_back(v[i].substr(40, 41));
+		v[1].push_back(v[0][i].substr(0, 41)); // quadrant 1 ~ Left-Up
+		v[2].push_back(v[0][i].substr(40, 41)); // quadrant 2 ~ Right-Up
 	}
 
-	for (int i = v.size() / 2; i < v.size(); ++i)
+	for (int i = v[0].size() / 2; i < v[0].size(); ++i)
 	{
-		v3.push_back(v[i].substr(0, 41));
-		v4.push_back(v[i].substr(40, 41));
+		v[3].push_back(v[0][i].substr(0, 41)); // quadrant 3 ~ Left-Down
+		v[4].push_back(v[0][i].substr(40, 41)); // quadrant 4 ~ Right-Down
 	}
 }
 
@@ -122,50 +115,36 @@ int main()
 {
 	ios::sync_with_stdio(false);
 
-	string x;
-	vector<string> v, v1, v2, v3, v4;
+	vector<vector<string>> v(5);
+
 	while (!in.eof())
 	{
+		string x;
 		in >> x;
-		v.push_back(x);
+		v[0].push_back(x);
 	}
-	map<char, pair<ll, ll>> keys, keys1, keys2, keys3, keys4;
-	pair<ll, ll> s_p, s_p1, s_p2, s_p3, s_p4; // start point
+	vector< map<char, pair<ll, ll>>> keys(5);
+	vector<pair<ll, ll>> start_point(5); // start point
 
-	find_keys_doors_start(v, keys, s_p);
-	cout <<"Part1: " << lee(v, s_p) << endl;
+	Find_keys_start(v[0], keys[0], start_point[0]);
+	cout << "Part1: " << BFS(v[0], start_point[0]) << endl;
 
-	v[s_p.first - 1][s_p.second - 1] = '@';		v[s_p.first - 1][s_p.second] = '#';		v[s_p.first - 1][s_p.second + 1] = '@';
-	v[s_p.first][s_p.second - 1] = '#';		v[s_p.first][s_p.second] = '#';		v[s_p.first][s_p.second + 1] = '#';
-	v[s_p.first + 1][s_p.second - 1] = '@';		v[s_p.first + 1][s_p.second] = '#';		v[s_p.first + 1][s_p.second + 1] = '@';
+	v[0][start_point[0].first - 1][start_point[0].second - 1] = '@';		v[0][start_point[0].first - 1][start_point[0].second] = '#';		v[0][start_point[0].first - 1][start_point[0].second + 1] = '@';
+	v[0][start_point[0].first]	  [start_point[0].second - 1] = '#';		v[0][start_point[0].first]	  [start_point[0].second] = '#';		v[0][start_point[0].first]	  [start_point[0].second + 1] = '#';
+	v[0][start_point[0].first + 1][start_point[0].second - 1] = '@';		v[0][start_point[0].first + 1][start_point[0].second] = '#';		v[0][start_point[0].first + 1][start_point[0].second + 1] = '@';
 
-	{
-		split_mat(v, v1, v2, v3, v4);
+	Split_map(v);
 
-		find_keys_doors_start(v1, keys1, s_p1);
-		find_keys_doors_start(v2, keys2, s_p2);
-		find_keys_doors_start(v3, keys3, s_p3);
-		find_keys_doors_start(v4, keys4, s_p4);
+	ll part2_ans = 0;
+
+	for (int i = 1; i <= 4; ++i)
+	{	
+		Find_keys_start(v[i], keys[i], start_point[i]);
+		ll aux = BFS(v[i], start_point[i], keys[i]);
+		part2_ans += aux;
+		cout << "Part2 - quadrant " << i << ": " << aux << endl;
 	}
-
-	ll p2_ans = 0;
-	ll aux;
-	{
-		aux = lee(v1, s_p1, keys1);
-		p2_ans += aux;
-		cout << "Part2 - 1: " << aux << endl;
-		aux = lee(v2, s_p2, keys2);
-		p2_ans += aux;
-		cout << "Part2 - 2: " << aux << endl;
-		aux = lee(v3, s_p3, keys3);
-		p2_ans += aux;
-		cout << "Part2 - 3: " << aux << endl;
-		aux = lee(v4, s_p4, keys4);
-		p2_ans += aux;
-		cout << "Part2 - 4: " << aux << endl;
-	}
-
-	cout << "Part2: " << p2_ans << endl;
+	cout << "Part2: " << part2_ans << endl;
 
 	return 0;
 }
