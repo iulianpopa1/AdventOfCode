@@ -21,20 +21,21 @@ ll dirY[4] = { 0, -1, 0, 1 };
 
 void Find_keys_start(vector<string> v, map<char, pair<ll, ll>>& keys, pair<ll, ll>& start_point)
 {
-	for (char c = 'A'; c <= 'Z'; ++c)
+	for (char c = 'a'; c <= 'z'; ++c)
 	{
-		for (ll i = 0; i < v.size(); ++i)
+		for (ll row = 0; row < v.size(); ++row)
 		{
-			auto find_it = find(v[i].cbegin(), v[i].cend(), c + 32);
-			if (find_it != v[i].cend())
-				keys[c + 32] = { i, find_it - v[i].begin() };
+			auto column = find(v[row].cbegin(), v[row].cend(), c);
+			if (column != v[row].cend())
+			{ 
+				keys[c] = { row, column - v[row].begin() };
+			}
 
-
-			find_it = find(v[i].cbegin(), v[i].cend(), '@');
-			if (find_it != v[i].cend())
+			column = find(v[row].cbegin(), v[row].cend(), '@');
+			if (column != v[row].cend())
 			{
-				start_point.first = i;
-				start_point.second = find_it - v[i].begin();
+				start_point.first = row;
+				start_point.second = column - v[row].begin();
 			}
 		}
 	}
@@ -48,7 +49,9 @@ ll BFS(vector<string> v, pair<ll, ll> start, map<char, pair<ll, ll>> keys = map<
 	ll bit_set = 0;
 
 	if (keys.size())
+	{
 		bit_set = pow(2, 26) - 1;
+	}
 
 	for (auto it : keys)
 	{
@@ -58,19 +61,19 @@ ll BFS(vector<string> v, pair<ll, ll> start, map<char, pair<ll, ll>> keys = map<
 	vis.insert({ start.first, start.second, 0 });
 	q.push({ start.first, start.second, bit_set , 0 });
 
-
 	while (!q.empty())
 	{
 		ll x = get<0>(q.front());
 		ll y = get<1>(q.front());
-		ll bs_ll = get<2>(q.front());
-		ll d = get<3>(q.front());
-		bitset<26> bs(bs_ll);
+		bit_set = get<2>(q.front());
+		ll dist = get<3>(q.front());
+
+		bitset<26> bs(bit_set);
 		q.pop();
 
-		if (bs == bitset<26>(pow(2, 26) - 1)) // 2 ^ 26 - 1
+		if (bs == bitset<26>(pow(2, 26) - 1))
 		{
-			return d;
+			return dist;
 		}
 
 		for (ll i = 0; i < 4; ++i)
@@ -80,9 +83,12 @@ ll BFS(vector<string> v, pair<ll, ll> start, map<char, pair<ll, ll>> keys = map<
 			char ch_new = v[x_new][y_new];
 			bitset<26> bs_new = bs;
 
-			if (ch_new == '#') continue;
-			if (vis.find({ x_new, y_new, bs_ll }) != vis.end()) continue;
-			if (ch_new >= 'A' && ch_new <= 'Z' && !bs[ch_new - 'A']) continue;
+			if (ch_new == '#') 
+				continue;
+			if (vis.find({ x_new, y_new, bit_set }) != vis.end()) 
+				continue;
+			if (ch_new >= 'A' && ch_new <= 'Z' && !bs[ch_new - 'A']) 
+				continue;
 
 			if (ch_new >= 'a' && ch_new <= 'z' && !bs[ch_new - 'a'])
 			{
@@ -90,7 +96,7 @@ ll BFS(vector<string> v, pair<ll, ll> start, map<char, pair<ll, ll>> keys = map<
 			}
 
 			vis.insert({ x_new, y_new, bs_new.to_ulong() });
-			q.push({ x_new, y_new, bs_new.to_ulong(), d + 1 });
+			q.push({ x_new, y_new, bs_new.to_ulong(), dist + 1 });
 		}
 	}
 }
@@ -132,6 +138,9 @@ int main()
 	v[0][start_point[0].first - 1][start_point[0].second - 1] = '@';		v[0][start_point[0].first - 1][start_point[0].second] = '#';		v[0][start_point[0].first - 1][start_point[0].second + 1] = '@';
 	v[0][start_point[0].first]	  [start_point[0].second - 1] = '#';		v[0][start_point[0].first]	  [start_point[0].second] = '#';		v[0][start_point[0].first]	  [start_point[0].second + 1] = '#';
 	v[0][start_point[0].first + 1][start_point[0].second - 1] = '@';		v[0][start_point[0].first + 1][start_point[0].second] = '#';		v[0][start_point[0].first + 1][start_point[0].second + 1] = '@';
+	/*		@ # @		*/
+	/*		# # #		*/
+	/*		@ # @		*/
 
 	Split_map(v);
 
