@@ -149,7 +149,7 @@ int main()
 	ios::sync_with_stdio(false);
 
 	vector <ll> vec;
-	ll x;
+	ll x, nat_X = 0, nat_Y = 0;
 
 	while (!in.eof())
 	{
@@ -162,13 +162,8 @@ int main()
 		vec.push_back(0);
 	}
 
-	ll nat_X, nat_Y;
-
-	vector <ll> instructs[50];
+	vector <ll> instructs[50], index(50, 0), rel_base(50, 0);
 	vector<queue<ll>> inp(50), out(50);
-	queue<ll> inputQ, outputQ;
-	vector<ll> index(50, 0);
-	vector<ll> rel_base(50, 0);
 
 	for (int i = 0; i < 50; ++i)
 	{
@@ -178,8 +173,9 @@ int main()
 		do_instructions(instructs[i], index[i], inp[i], out[i], rel_base[i]);
 	}
 
-	bool p1 = true;
-	while (p1)
+	bool p1 = true, idle_net;
+	ll last_X = -1, last_Y = -1;
+	while (1)
 	{
 		for (int i = 0; i < 50; ++i)
 		{
@@ -196,11 +192,14 @@ int main()
 			
 				if (addr == 255)
 				{
-					cout << "Part1: " << y << endl;
+					
 					nat_X = x;
 					nat_Y = y;
-					//return 0;
-					p1 = false;
+					if (p1)
+					{
+						cout << "Part1: " << y << endl;
+						p1 = false;
+					}
 				}
 				else
 				{ 
@@ -209,55 +208,24 @@ int main()
 				}
 			}
 		}
-	}
+		idle_net = true;
 
-	ll last_X = -1, last_Y = -1;
-
-	while (1)
-	{
-		for (int i = 0; i < 50; ++i)
+		for (auto & it : inp)
 		{
-			do_instructions(instructs[i], index[i], inp[i], out[i], rel_base[i]);
-
-			if (out[i].size() >= 3)
+			if (it.size() == 0)
 			{
-				ll addr = out[i].front();
-				out[i].pop();
-				ll x = out[i].front();
-				out[i].pop();
-				ll y = out[i].front();
-				out[i].pop();
-
-				if (addr == 255)
-				{
-					nat_X = x;
-					nat_Y = y;
-				}
-				else
-				{
-					inp[addr].push(x);
-					inp[addr].push(y);
-				}
-			}
-		}
-
-		bool idle_net = true;
-		for (int i = 0; i < 50; ++i)
-		{
-			if (inp[i].size() == 0)
-			{ 
-				inp[i].push(-1);
+				it.push(-1);
 			}
 			else
 			{
 				idle_net = false;
 			}
-				
 		}
+
 		if (idle_net)
 		{
 			inp[0].pop();
-			if (nat_X == last_X && nat_Y == last_Y) 
+			if (nat_X == last_X && nat_Y == last_Y)
 			{
 				cout << "Part2: " << nat_Y;
 				return 0;
