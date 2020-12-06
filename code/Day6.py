@@ -14,17 +14,17 @@ alpha = list(string.ascii_lowercase)
 p1 = 0
 p2 = 0
 
-for line in input:
+for chunk in input:
     for char in alpha:
         #Part 1
-        if char in line:
+        if char in chunk:
             p1 += 1
         
         #Part 2
         every = True
 
-        for z in line.split('\n'):
-            if char not in z:
+        for line in chunk.split('\n'):
+            if char not in line:
                 every = False
 
         if every == True:
