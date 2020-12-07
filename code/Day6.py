@@ -1,4 +1,3 @@
-from functools import reduce
 import string
 from utils import DataFiles
 
