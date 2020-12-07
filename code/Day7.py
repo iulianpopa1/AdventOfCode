@@ -7,60 +7,51 @@ input = dataFiles.get_input()  # inputRaw = dataFiles.input
 inputEX = dataFiles.get_inputEX()  # inputRawEX = dataFiles.inputEX
 
 
-reg_big_attr = re.compile(r'(.*) bags contain (.*).$')
-reg_shiny_gold = re.compile(r'(\d+) shiny gold')
-reg_no_col = re.compile(r'^(\d+) (.*) bag.*$')
+def contains_color(bag_color):
+    for color, needed in bag_rules.items():
+        if bag_color in needed.keys():
+            contains_gold.add(color)
+            contains_color(color)
 
 
-p1 = 0
-bag_dict_ingredients = dict()
+def needed_bags(bag_color):
+    total = 0
 
-for line in inputEX:
-    xx = reg_big_attr.findall(line)
-    
-    bag_main = xx[0][0]
-    bag_dict_ingredients[bag_main] = dict()
-
-    xxx = xx[0][1].split(', ')
-
-    for xxxx in xxx:
-        yy = reg_no_col.findall(xxxx)
-        if(len(yy) != 0):
-            bag_comp = yy[0][1]
-            bag_comp_q = yy[0][0]
-            bag_dict_ingredients[bag_main][bag_comp] = bag_comp_q
-
-
-def apart_bag(bag_col):
-    p2 = 0
-    if len(bag_dict_ingredients[bag_col]) == 0:
+    if len(bag_rules[bag_color]) == 0:
         return 0
-    
-    for aux_bag in bag_dict_ingredients[bag_col]:
-        ingredients = int(bag_dict_ingredients[bag_col][aux_bag])
-        more_ing = apart_bag(aux_bag)
-        p2 += ingredients + ingredients * more_ing
-    return p2
+
+    for comp_bag in bag_rules[bag_color]:
+        no_bags = bag_rules[bag_color][comp_bag]
+
+        need_bags = needed_bags(comp_bag)
+
+        total += no_bags + no_bags * need_bags
+    return total
 
 
-print(apart_bag('shiny gold'))
+bag_rules = dict()  # key: color, value: dict(color, quantity)
+
+# Parsing
+for line in input:
+    color, all_rules = re.findall(r'(.*) bags contain (.*).$', line)[0]
+
+    bag_rules[color] = dict()
+
+    rules = all_rules.split(', ')
+
+    for rule in rules:
+        try:
+            bag_quantity, bag_color = re.findall(
+                r'^(\d+) (.*) bag.*$', rule)[0]
+            bag_rules[color][bag_color] = int(bag_quantity)
+        except:
+            pass
+
+contains_gold = set()
+contains_color("shiny gold")
+
+print("Part 1:", len(contains_gold))
+print('Part 2:', needed_bags('shiny gold'))
 
 
-# Part 1
-# cont_bags = set()
-# cont_bags.add('shiny gold')
-
-# found = True
-# while found == True:
-#     found = False
-#     for bag, ingredients in bag_dict_ingredients.items():
-#         if bag not in cont_bags:
-#             for aux in ingredients.keys():
-#                 if aux in cont_bags:
-#                     cont_bags.add(bag)
-#                     print(ingredients)
-#                     found = True
-#                     break
-
-# print('Part1 :', len(cont_bags) - 1)
-
+#To add networkx
