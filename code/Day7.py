@@ -41,17 +41,13 @@ for line in input:
 
     for rule in rules:
         try:
-            bag_quantity, bag_color = re.findall(
-                r'^(\d+) (.*) bag.*$', rule)[0]
+            bag_quantity, bag_color = re.findall(r'^(\d+) (.*) bag.*$', rule)[0]
             bag_rules[color][bag_color] = int(bag_quantity)
         except:
             pass
 
 contains_gold = set()
-contains_color("shiny gold")
+contains_color('shiny gold')
 
-print("Part 1:", len(contains_gold))
+print('Part 1:', len(contains_gold))
 print('Part 2:', needed_bags('shiny gold'))
-
-
-#To add networkx
