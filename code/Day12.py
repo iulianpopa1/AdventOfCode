@@ -1,5 +1,4 @@
 from utils import DataFiles
-import math
 import re
 
 
@@ -35,7 +34,6 @@ curr_pos = 0 + 0j
 curr_dir = 1 + 0j
 
 for dir, units in inp:
-
     if dir == 'F':
         curr_pos += curr_dir * units
     elif dir == 'R':
@@ -51,7 +49,6 @@ curr_pos = 0 + 0j
 wayp = 10 + 1j
 
 for dir, units in inp:
-
     if dir == 'F':
         curr_pos += wayp * units
     elif dir == 'R':
