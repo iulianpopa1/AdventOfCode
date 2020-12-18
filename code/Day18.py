@@ -8,15 +8,11 @@ inputEX = dataFiles.get_inputEX()  # inputRawEX = dataFiles.inputEX
 
 
 def eval_simple_expr(expr):
-    ops = [int(x) if x != '+' and x != '*' else x for x in expr.split()]
+    ops = expr.split()
     result = ops[0]
-
     i = 1
     while i < len(ops):
-        if ops[i] == '+':
-            result += ops[i + 1]
-        elif ops[i] == '*':
-            result *= ops[i + 1]
+        result = str(eval(result + ops[i] + ops[i + 1]))
         i += 2
 
     return result
@@ -28,7 +24,7 @@ def solve_p1(expr):
         expr = re.sub(par_reg,
                       lambda x: str(eval_simple_expr(x[0][1:-1])), expr)
 
-    return eval_simple_expr(expr)
+    return int(eval_simple_expr(expr))
 
 
 def eval_add_first(expr):
@@ -36,7 +32,7 @@ def eval_add_first(expr):
         expr = re.sub(r'\d+ \+ \d+',
                       lambda x: str(eval(x[0])), expr)
 
-    return eval_simple_expr(expr)
+    return int(eval_simple_expr(expr))
 
 
 def solve_p2(expr):
