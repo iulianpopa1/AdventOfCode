@@ -42,33 +42,36 @@ def decode():
 
                 decoded[k] = '(' + r + ')'
 
+def part1():
+    while '0' not in decoded.keys():
+        decode()
+
+    count = 0
+    for message in messages:
+        if re.match('^' + decoded['0'] + '$', message):
+            count += 1
+    return count
+
+
+def part2():
+    messages_found = set()
+    rules['8'] = '42 | 42 8'
+    rules['11'] = '42 31 | 42 11 31'
+
+    while True:
+        decode()
+        prev_size = len(messages_found)
+
+        for message in messages:
+            if re.match('^' + decoded['0'] + '$', message):
+                messages_found.add(message)
+
+        if len(messages_found) == prev_size:
+            return len(messages_found)
+
 
 rules, messages = parse(input)
 decoded = {}
 
-while '0' not in decoded.keys():
-    decode()
-
-p1 = 0
-for message in messages:
-    if re.match('^' + decoded['0'] + '$', message):
-        p1 += 1
-
-
-print('Part1:', p1)
-
-messages_found = set()
-rules['8'] = '42 | 42 8'
-rules['11'] = '42 31 | 42 11 31'
-
-while True:
-    decode()
-
-    prev_size = len(messages_found)
-    for message in messages:
-        if re.match('^' + decoded['0'] + '$', message):
-            messages_found.add(message)
-
-    if len(messages_found) == prev_size:
-        print('Part2:', len(messages_found))
-        break
+print('Part1:', part1())
+print('Part2:', part2())
