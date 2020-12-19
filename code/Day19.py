@@ -14,8 +14,7 @@ def parse(input):
     rules = {}
 
     for line in rules_input:
-        spl = line.split(': ')
-        rules[spl[0]] = spl[1]
+        rules[line.split(': ')[0]] = line.split(': ')[1]
 
     return rules, messages
 
@@ -25,22 +24,22 @@ def decode():
         if(v[0] == '"'):
             decoded[k] = v[1]
         else:
-            spl = v.split()
             fully_decoded = True
 
-            for s in spl:
+            for s in v.split():
                 if s not in decoded.keys() and s != '|':
                     fully_decoded = False
 
             if fully_decoded == True:
                 r = ''
-                for s in spl:
+                for s in v.split():
                     if s in decoded.keys():
                         r += decoded[s]
                     else:
                         r += '|'
 
                 decoded[k] = '(' + r + ')'
+
 
 def part1():
     while '0' not in decoded.keys():
@@ -66,7 +65,7 @@ def part2():
             if re.match('^' + decoded['0'] + '$', message):
                 messages_found.add(message)
 
-        if len(messages_found) == prev_size:
+        if len(messages_found) == prev_size: #There's a loop
             return len(messages_found)
 
 
