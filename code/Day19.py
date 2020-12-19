@@ -16,8 +16,9 @@ def parse(input):
     for line in rules_input:
         spl = line.split(': ')
         rules[spl[0]] = spl[1]
-    
+
     return rules, messages
+
 
 def decode():
     for k, v in rules.items():
@@ -53,6 +54,7 @@ for message in messages:
     if re.match('^' + decoded['0'] + '$', message):
         p1 += 1
 
+
 print('Part1:', p1)
 
 messages_found = set()
@@ -60,20 +62,13 @@ rules['8'] = '42 | 42 8'
 rules['11'] = '42 31 | 42 11 31'
 
 while True:
-    is_loop = True
     decode()
 
+    prev_size = len(messages_found)
     for message in messages:
         if re.match('^' + decoded['0'] + '$', message):
             messages_found.add(message)
-            if message not in messages_found:
-                messages_found.add(message)
-                is_loop = False
-    
-    if is_loop == True:
+
+    if len(messages_found) == prev_size:
         print('Part2:', len(messages_found))
         break
-
-
-
-
