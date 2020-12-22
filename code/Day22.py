@@ -34,7 +34,7 @@ def part1(q1, q2):
     return q1, q2
 
 
-def combat_p2(q1, q2):
+def part2(q1, q2):
     used = set()
     while(len(q1) > 0 and len(q2) > 0):
         roundLog = (tuple(q1), tuple(q2))
@@ -48,7 +48,7 @@ def combat_p2(q1, q2):
         win = 0
 
         if len(q1) > c1 and len(q2) > c2:
-            _, _, win = combat_p2(q1[1:c1 + 1], q2[1:c2 + 1])
+            _, _, win = part2(q1[1:c1 + 1], q2[1:c2 + 1])
         
         if win == 1 or (c1 > c2 and win == 0):
             q1 = q1[1:] + [c1, c2]
@@ -64,21 +64,15 @@ def combat_p2(q1, q2):
 
 
 def main(inp):
-    q1 = []
-    q2 = []
-
     players = inputRaw.read().split('\n\n')
 
-    for card in players[0].splitlines()[1:]:
-        q1.append(int(card))
-
-    for card in players[1].splitlines()[1:]:
-        q2.append(int(card))
+    q1 = [int(x) for x in players[0].splitlines()[1:]]
+    q2 = [int(x) for x in players[1].splitlines()[1:]]   
 
     q1_c, q2_c = part1(list.copy(q1), list.copy(q2))
     print('Part1:', calc_score(q1_c, q2_c))
 
-    q1_cc, q2_cc, _ = combat_p2(list.copy(q1), list.copy(q2))
+    q1_cc, q2_cc, _ = part2(list.copy(q1), list.copy(q2))
     print('Part2:', calc_score(q1_cc, q2_cc))
 
 
