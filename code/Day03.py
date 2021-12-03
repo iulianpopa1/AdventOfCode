@@ -1,5 +1,6 @@
 from utils import DataFiles
 import numpy
+from collections import *
 
 dataFiles = DataFiles(__file__)
 
@@ -78,3 +79,32 @@ for j in range(len(inp[0])):
         break
 
 print("Part 2: ", int(gamma, 2) * int(epsilon, 2))
+
+
+### TRYHARD
+inp = input[:]
+gamma = ""
+epsilon = ""
+
+# Transpose the matrix
+for x in ["".join(s) for s in zip(*inp)]:
+    condition_evaluation = x.count("0") < x.count("1")
+    gamma += str(int(condition_evaluation))
+    epsilon += str(int(not (condition_evaluation)))
+
+print("Part 1: ", int(gamma, 2) * int(epsilon, 2))
+
+# Part 2
+inp_oxygen = input[:]
+inp_co2 = input[:]
+
+for pos in range(len(inp_oxygen[0])):
+    trans_gamma = ["".join(s) for s in zip(*inp_oxygen)]
+    more = 1 - int(min(trans_gamma[pos], key=trans_gamma[pos].count))
+    inp_oxygen = [x for x in inp_oxygen if x[pos] == str(more)]
+
+    trans_gamma = ["".join(s) for s in zip(*inp_co2)]
+    fewer = int(min(trans_gamma[pos], key=trans_gamma[pos].count))
+    inp_co2 = [x for x in inp_co2 if x[pos] == str(fewer)]
+
+print("Part 2: ", int(inp_oxygen[0], 2) * int(inp_co2[0], 2))
