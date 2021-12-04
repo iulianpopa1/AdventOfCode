@@ -48,45 +48,40 @@ class Board:
     def checkBingo(self):
         return 5 in self.bingo["row"] or 5 in self.bingo["col"]  # or 5 in self.bingo["diagonal"]
 
-    def printBingo(self):
+    def printBoard(self):
         print("\n")
         for i in range(5):
             print(self.playBoard[i])
 
+    def sumOfUnmarkedNumbers(self):
+        nr_sum = 0
+        for i in range(5):
+            for j in range(5):
+                if board.playBoard[i][j] != "X":
+                    nr_sum += board.playBoard[i][j]
+        return nr_sum
 
-print(len(inp[1]))
 
-myBingos = []
-for x in range(1, len(inp)):
+bingoBoards = []
+
+for x in range(len(inp)):
     if len(inp[x]) == 0:
-        board = Board(
-            [
-                [int(x) for x in inp[x + 1].split()],
-                [int(x) for x in inp[x + 2].split()],
-                [int(x) for x in inp[x + 3].split()],
-                [int(x) for x in inp[x + 4].split()],
-                [int(x) for x in inp[x + 5].split()],
-            ]
-        )
-        myBingos.append(board)
-    x += 5
+        bingoBoards.append(Board([[int(nr) for nr in inp[x + i].split()] for i in range(1, 6)]))
+        x += 5
+
+lastBingo = -1
+
+for number in [int(nr) for nr in inp[0].split(",")]:
+    for board in bingoBoards:
+        board.updateBoard(number)
+        if board.checkBingo():
+            unmarkedSum = board.sumOfUnmarkedNumbers()
+            # print("{0} BINGO! => Ans: {1} ({2} * {3})".format(number, nr_sum * number, number, nr_sum))
+            bingoBoards.remove(board)
+
+            if lastBingo == -1:
+                print("Part1:", number * unmarkedSum)
+            lastBingo = number * unmarkedSum
 
 
-# for x in inp[0].split(',')
-found_bingo = False
-summ = 0
-for x in [int(y) for y in inp[0].split(",")]:
-    for xx in myBingos:
-        xx.updateBoard(x)
-        if xx.checkBingo():
-            summ = 0
-            found_bingo = True
-            print("bingo : ", x)
-            for i in range(5):
-                for j in range(5):
-                    if xx.playBoard[i][j] != "X":
-                        summ += xx.playBoard[i][j]
-            print(summ, x)
-            print(summ * x)
-            print("\n")
-            myBingos.remove(xx)
+print("Part2:", lastBingo)
