@@ -1,4 +1,6 @@
 from utils import DataFiles
+from collections import *
+from numpy import *
 
 dataFiles = DataFiles(__file__)
 
