@@ -12,7 +12,7 @@ class DataFiles:
 
     def __init__(self, path):
         self._code_path = path
-        self._input_path = path.replace("code", "inputs").replace("Day", "").replace(".py", ".txt")
+        self._input_path = path.replace("code", "input").replace("Day", "").replace(".py", ".txt")
         self._example_path = re.sub(r"(\w+)(.txt$)", r"Example\g<2>", self._input_path)
 
         self._inputFile = open(self._input_path)
