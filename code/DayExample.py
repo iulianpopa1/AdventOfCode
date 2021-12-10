@@ -1,7 +1,9 @@
 from utils import DataFiles
 from collections import *
-from numpy import *
 from math import *
+
+import numpy as np
+import re
 
 dataFiles = DataFiles(__file__)
 
