@@ -1,3 +1,4 @@
+from numpy.lib.twodim_base import diag
 from utils import DataFiles
 from collections import *
 from math import *
@@ -23,79 +24,60 @@ for x in range(len(inp)):
         mat[x][y] = inp[x][y]
 
 
-def get_neigh(x, y):
-    neigh = []
+def get_neigh_x(x, y, x_min=0, y_min=0, x_max=inf, y_max=inf, diag=False):
+    possible_x = [x]
+    possible_y = [y]
 
-    if x > 0:
-        neigh.append((x - 1, y))
-        if y > 0:
-            neigh.append((x - 1, y - 1))
-    if x < len(mat) - 1:
-        neigh.append((x + 1, y))
-        if y < len(mat[x]) - 1:
-            neigh.append((x + 1, y + 1))
-    if y > 0:
-        neigh.append((x, y - 1))
-        if x < len(mat) - 1:
-            neigh.append((x + 1, y - 1))
-    if y < len(mat[x]) - 1:
-        neigh.append((x, y + 1))
-        if x > 0:
-            neigh.append((x - 1, y + 1))
+    possible_x.append(x - 1) if x > x_min else None
+    possible_x.append(x + 1) if x < x_max else None
+    possible_y.append(y - 1) if y > y_min else None
+    possible_y.append(y + 1) if y < y_max else None
 
-    return neigh
-
-
-print(mat)
-
-
-def mprint(mat):
-    for x in range(len(inp)):
-        st = ""
-        for y in range(len(inp[0])):
-            st += str(mat[x][y])
-        print(st)
-
-
-cnt = 0
+    if diag == False:
+        return [(a, b) for a in possible_x for b in possible_y if (a, b) != (x, y) and (a != x ^ b != y)]
+    else:
+        return [(a, b) for a in possible_x for b in possible_y if (a, b) != (x, y)]
 
 
 def iterate(mat):
-    mat2 = deepcopy(mat)
+    aux_mat = deepcopy(mat)
+
     flash = []
     all_flash = []
 
     for x in range(len(inp)):
         for y in range(len(inp[0])):
-            if mat2[x][y] == 9:
+            aux_mat[x][y] += 1
+            if aux_mat[x][y] > 9:
                 flash.append((x, y))
                 all_flash.append((x, y))
-            else:
-                mat2[x][y] += 1
 
     while len(flash) > 0:
         x, y = flash.pop()
-        neigh = get_neigh(x, y)
-
+        neigh = get_neigh_x(x, y, x_max=len(inp) - 1, y_max=len(inp[0]) - 1, diag=True)
         for xn, yn in neigh:
-            if mat2[xn][yn] == 9:
-                if (xn, yn) not in all_flash:
-                    flash.append((xn, yn))
-                    all_flash.append((xn, yn))
-            else:
-                mat2[xn][yn] += 1
+            aux_mat[xn][yn] += 1
+            if aux_mat[xn][yn] > 9 and (xn, yn) not in all_flash:
+                flash.append((xn, yn))
+                all_flash.append((xn, yn))
 
     for x, y in all_flash:
-        mat2[x][y] = 0
+        aux_mat[x][y] = 0
 
     if len(all_flash) == 100:
-        print("all_flash", len(all_flash))
-    return mat2, len(all_flash)
+        return aux_mat, len(all_flash), True
 
+    return aux_mat, len(all_flash), False
+
+
+cnt = 0
 
 for i in range(1, 300):
-    print("\n", i)
-    mat, aux = deepcopy(iterate(mat))
-
+    mat, aux, part2_check = deepcopy(iterate(mat))
     cnt += aux
-print(cnt)
+
+    if i == 100:
+        print("Part1:", cnt)
+    if part2_check == True:
+        print("Part2:", i)
+        exit()
