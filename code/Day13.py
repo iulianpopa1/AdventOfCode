@@ -16,32 +16,33 @@ inp = input[:]
 def mprint(mat):
     print()
     for y in range(len(mat)):
-        print("".join(mat[y]))
+        print("".join(mat[y][x] if mat[y][x] == "#" else " " for x in range(len(mat[y]))))
 
 
 points = []
+folds = []
 
-sv_l = 0
+fold_instuctions_chunk = False
 
 for line in range(len(inp)):
     if inp[line] == "":
-        sv_l = line
-        break
-    y, x = inp[line].split(",")
-    points.append((int(y), int(x)))
+        fold_instuctions_chunk = True
+        continue
 
-folds = []
+    if fold_instuctions_chunk == False:
+        y, x = inp[line].split(",")
+        points.append((int(y), int(x)))
+    else:
+        k, v = inp[line].split("=")
+        folds.append((k[-1], int(v)))
 
-for line in range(sv_l + 1, len(inp)):
-    l = inp[line].split("=")
-    folds.append((l[0][-1], int(l[1])))
 
 y_max = max(y for y, _ in points)
 x_max = max(x for _, x in points)
 
-
 rows = x_max + 1
 cols = y_max + 1
+
 mat = np.empty((rows, cols), dtype=str)
 mat.fill(".")
 
@@ -59,9 +60,7 @@ def fold(mat, line, line_v):
                 if mat[2 * line_v - y][x] == "#":
                     mat[y][x] = "#"
 
-        mat = mat[
-            : -line_v - 1 :,
-        ]
+        mat = mat[: -line_v - 1 :]
     else:
         for y in range(len(mat)):
             mat[y][line_v] = "|"
@@ -85,7 +84,14 @@ for y in range(len(mat_p1)):
 
 for l in range(len(folds)):
     mat = fold(mat, folds[l][0], folds[l][1])
-    mprint(mat)
 
 print("Part1:", ans)
-exit()
+
+mprint(mat)
+
+ans_mat_2d = np.array([[1 if mat[y][x] == "#" else 0 for x in range(len(mat[0]))] for y in range(len(mat))])
+
+import matplotlib.pyplot as plt
+
+plt.imshow(ans_mat_2d)
+plt.show()
