@@ -10,7 +10,7 @@ dataFiles = DataFiles(__file__)
 input = dataFiles.input
 inputEX = dataFiles.inputEX
 
-inp = inputEX[:]
+inp = input[:]
 
 
 def parse_inp():
@@ -88,7 +88,6 @@ def part2():
             cuboid.remove(area)
         if is_on:
             cuboids.append(Cuboid(area))
-        print(len(cuboids), sum(cuboid.size() for cuboid in cuboids))
     return sum(cuboid.size() for cuboid in cuboids)
 
 
