@@ -10,14 +10,14 @@ dataFiles = DataFiles(__file__)
 input = dataFiles.input
 inputEX = dataFiles.inputEX
 
-inp = input[:]
+inp = inputEX[:]
 
 
 def parse_inp():
     parsed_inp = []
 
-    for l in inp:
-        spl = l.split()
+    for line in inp:
+        spl = line.split()
         onoff = True if spl[0] == "on" else False
         ranges = [int(nr) for nr in re.findall(r"[\+\-]?\d+", spl[1])]
         xr = sorted([ranges[0], ranges[1]])
@@ -70,8 +70,8 @@ class Cuboid:
         clean_area = intersect_area(self.area, area)
 
         if clean_area:
-            for vacuum in self.ignored:
-                vacuum.remove(clean_area)
+            for ingore in self.ignored:
+                ingore.remove(clean_area)
             self.ignored.append(Cuboid(clean_area))
 
     def size(self):
@@ -88,10 +88,11 @@ def part2():
             cuboid.remove(area)
         if is_on:
             cuboids.append(Cuboid(area))
-
+        print(len(cuboids), sum(cuboid.size() for cuboid in cuboids))
     return sum(cuboid.size() for cuboid in cuboids)
 
 
 inp = parse_inp()
+
 print("Part1:", part1())
 print("Part2:", part2())
