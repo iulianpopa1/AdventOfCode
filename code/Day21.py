@@ -11,15 +11,16 @@ dataFiles = DataFiles(__file__)
 input = dataFiles.input
 inputEX = dataFiles.inputEX
 
-inp = inputEX[:]
+inp = input[:]
 
 
 def mod10(x):
     return ((x - 1) % 10) + 1
 
 
-p1 = 4
-p2 = 2
+p1 = int(inp[0][-1])
+p2 = int(inp[1][-1])
+
 cnt = 0
 pos = [p1, p2]
 score = [0, 0]
@@ -31,7 +32,7 @@ for i in range(1000):
     if score[i % 2] >= 1000:
         break
 
-print(min(score) * cnt)
+print("Part1:", min(score) * cnt)
 
 
 def update_tuple(old, turn, new):
@@ -69,4 +70,4 @@ while universes:
 
                 universes[next_key] = universes.get(next_key, 0) + new_count
 
-print(max(all_scores))
+print("Part2:", max(all_scores))
