@@ -48,9 +48,11 @@ total_p2 = 0
 for line in input:
     p1, p2 = line.split()
 
-    total_p1 += obj_score[p2] + battle_score[battle_eval[p1][p2]]
+    total_p1 += obj_score[p2]  # score of the shape
+    total_p1 += battle_score[battle_eval[p1][p2]]  # score of the [outcome of the battle]
 
-    total_p2 += battle_score[req_outcome_p2[p2]] + obj_score[battle_eval_p2[p1][req_outcome_p2[p2]]]
+    total_p2 += battle_score[req_outcome_p2[p2]]
+    total_p2 += obj_score[battle_eval_p2[p1][req_outcome_p2[p2]]]
 
 print("Part 1:", total_p1)
 print("Part 2:", total_p2)
