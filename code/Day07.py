@@ -55,22 +55,17 @@ total_p1 = 0
 for folder, size in file_sizes.items():
     if size <= 100000:
         total_p1 += size
-        # print(folder, size)
-
 
 print("Part1:", total_p1)
 
 fs_total = 70000000
 fs_req = 30000000
 sys_total = file_sizes["/"]
-sizes = list(file_sizes.values())
-sizes.sort()
-# sizes = sizes[1:]
-print("All sizes", sizes)
-
 free_space = fs_total - sys_total
+
+sizes = sorted(list(file_sizes.values()))
 
 for size in sizes:
     if free_space + size >= fs_req:
-        print(size)
+        print("Part2:", size)
         break
