@@ -8,46 +8,32 @@ inputEX = dataFiles.get_input(splitlines=True, example=True)
 
 dirs_letter = {"U": [-1, 0], "D": [1, 0], "L": [0, -1], "R": [0, 1]}
 
-ex_pos = [[0, 0], [0, 0]]
-tail_pos = {(0, 0)}
 
-for line in input:
-    dir, steps = line.split()
+def solve(knots):
+    rope = [(0, 0)] * knots
+    seen_tail_pos = {(0, 0)}
 
-    for step in range(int(steps)):
-        dx, dy = dirs_letter[dir]
-        ex_pos[0][0] += dx
-        ex_pos[0][1] += dy
+    for line in input:
+        dir, steps = line.split()
 
-        td_x = ex_pos[0][0] - ex_pos[1][0]
-        td_y = ex_pos[0][1] - ex_pos[1][1]
+        for step in range(int(steps)):
+            dx, dy = dirs_letter[dir]
+            rope[0] = (rope[0][0] + dx, rope[0][1] + dy)
 
-        if abs(td_x) > 1 or abs(td_y) > 1:
-            ex_pos[1][0] += -1 if td_x < 0 else 1 if td_x > 0 else 0
-            ex_pos[1][1] += -1 if td_y < 0 else 1 if td_y > 0 else 0
+            for i in range(1, len(rope)):
+                td_x = rope[i - 1][0] - rope[i][0]
+                td_y = rope[i - 1][1] - rope[i][1]
 
-        tail_pos.add((ex_pos[1][0], ex_pos[1][1]))
+                if abs(td_x) > 1 or abs(td_y) > 1:
+                    rope[i] = (
+                        rope[i][0] + (-1 if td_x < 0 else 1 if td_x > 0 else 0),
+                        rope[i][1] + (-1 if td_y < 0 else 1 if td_y > 0 else 0),
+                    )
 
-print("Part 1:", len(tail_pos))
+            seen_tail_pos.add((rope[-1][0], rope[-1][1]))
 
-ex_pos = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
-tail_pos = {(0, 0)}
+    return len(seen_tail_pos)
 
-for line in input:
-    dir, steps = line.split()
-    for step in range(int(steps)):
-        dx, dy = dirs_letter[dir]
-        ex_pos[0][0] += dx
-        ex_pos[0][1] += dy
 
-        for i in range(1, len(ex_pos)):
-            td_x = ex_pos[i - 1][0] - ex_pos[i][0]
-            td_y = ex_pos[i - 1][1] - ex_pos[i][1]
-
-            if abs(td_x) > 1 or abs(td_y) > 1:
-                ex_pos[i][0] += -1 if td_x < 0 else 1 if td_x > 0 else 0
-                ex_pos[i][1] += -1 if td_y < 0 else 1 if td_y > 0 else 0
-
-        tail_pos.add((ex_pos[-1][0], ex_pos[-1][1]))
-
-print("Part 2:", len(tail_pos))
+print("Part 1:", solve(2))
+print("Part 2:", solve(10))
