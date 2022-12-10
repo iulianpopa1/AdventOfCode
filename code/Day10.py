@@ -30,7 +30,7 @@ print(signals_strength_sum)
 x = 1
 for cycle in range(len(instr_queue)):
     if cycle % 40 in [x - 1, x, x + 1]:
-        print("#", end="")
+        print("█", end="")
     else:
         print(" ", end="")
 
