@@ -19,20 +19,16 @@ x = 1
 signals_strength_sum = 0
 
 for cycle in range(len(instr_queue)):
-    cycle_val = instr_queue[cycle]
-
     if cycle % 40 == 19:
         signals_strength_sum += (cycle + 1) * x
 
-    x += cycle_val
+    x += instr_queue[cycle]
 
 print(signals_strength_sum)
 
 
 x = 1
 for cycle in range(len(instr_queue)):
-    cycle_val = instr_queue[cycle]
-
     if cycle % 40 in [x - 1, x, x + 1]:
         print("#", end="")
     else:
@@ -41,4 +37,4 @@ for cycle in range(len(instr_queue)):
     if cycle % 40 == 39:
         print()
 
-    x += cycle_val
+    x += instr_queue[cycle]
