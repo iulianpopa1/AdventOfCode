@@ -16,7 +16,7 @@ def find_common_letters(items):
     return to_return
 
 
-p1 = 0
+p1, p2 = 0
 
 for rucksack in input:
     half_splits = [rucksack[: len(rucksack) // 2], rucksack[len(rucksack) // 2 :]]
@@ -24,14 +24,10 @@ for rucksack in input:
     common = list(find_common_letters(half_splits))
 
     if common[0].islower():
-        p1 += ord(common[0]) - 97 + 1
+        p1 += ord(common[0]) - ord("a") + 1
     else:
-        p1 += ord(common[0]) - 65 + 26 + 1
+        p1 += ord(common[0]) - ord("A") + 26 + 1
 
-print("Part1:", p1)
-
-
-p2 = 0
 
 # for pos in range(len(input) // 3):
 #   common = list(find_common_letters(input[pos * 3 : pos * 3 + 2]))
@@ -39,8 +35,9 @@ for chunk_of_3 in np.reshape(input, (len(input) // 3, 3)):
     common = list(find_common_letters(chunk_of_3))
 
     if common[0].islower():
-        p2 += ord(common[0]) - 96
+        p2 += ord(common[0]) - ord("a") + 1
     else:
-        p2 += ord(common[0]) - 65 + 27
+        p2 += ord(common[0]) - ord("A") + 26 + 1
 
+print("Part1:", p1)
 print("Part2:", p2)
