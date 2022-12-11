@@ -1,4 +1,5 @@
 from utils import DataFiles
+import re
 
 dataFiles = DataFiles(__file__)
 
@@ -18,11 +19,12 @@ total_p1 = 0
 total_p2 = 0
 
 for line in input:
-    x, y = line.split(",")
-    x1, x2 = map(int, x.split("-"))
-    y1, y2 = map(int, y.split("-"))
+    xoy = re.match("(\d+)-(\d+),(\d+)-(\d+)", line)
+    x1, x2, y1, y2 = int(xoy.group(1)), int(xoy.group(2)), int(xoy.group(3)), int(xoy.group(4))
+
     total_p1 += range_overlap_p1(x1, x2, y1, y2)
     total_p2 += range_overlap_p2(x1, x2, y1, y2)
+
 
 print("Part1:", total_p1)
 print("Part2:", total_p2)
