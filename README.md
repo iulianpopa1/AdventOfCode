@@ -1,2 +1,2 @@
-# AOC-2019
-Advent of Code 2019 solution repository
+# AOC-2020
+My solutions for [Advent of Code](https://adventofcode.com/) 2020. (*this year using Python 🐍*)
