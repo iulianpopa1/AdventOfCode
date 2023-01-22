@@ -1,2 +1,2 @@
-# AdventOfCode
-Advent of Code solutions
+# AOC-2019
+Advent of Code 2019 solution repository
